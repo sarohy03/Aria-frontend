@@ -6,18 +6,14 @@ import CTASection from './CTASection'
 import Footer from './Footer'
 
 export default function Landing({ onGetStarted }) {
-  const handleGetStarted = onGetStarted ?? (() => {
-    console.info('Get started — auth coming next')
-  })
-
   return (
     <div className="relative min-h-screen bg-[#030303]">
-      <Navbar onGetStarted={handleGetStarted} />
+      <Navbar onGetStarted={onGetStarted} />
       <main>
-        <Hero onGetStarted={handleGetStarted} />
+        <Hero onGetStarted={onGetStarted} />
         <Features />
         <HowItWorks />
-        <CTASection onGetStarted={handleGetStarted} />
+        <CTASection onGetStarted={onGetStarted} />
       </main>
       <Footer />
     </div>

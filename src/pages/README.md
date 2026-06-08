@@ -1,9 +1,10 @@
-# Pages
+# pages
 
-Top-level page components. Each page maps to a route (routing added later).
+Top-level page components. Each page maps to a route.
 
-| File | Purpose |
-|---|---|
-| `LandingPage.jsx` | Public landing / marketing page — renders `Landing` |
+| File | Route | Purpose |
+|---|---|---|
+| `LandingPage.jsx` | `/` | Public landing page |
+| `AuthPage.jsx` | `/auth` | Sign in, sign up, Google auth |
 
-Future pages: `LoginPage.jsx`, `ChatPage.jsx`.
+Future: `ChatPage.jsx` at `/chat`.

@@ -2,16 +2,27 @@
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #d4d4d8;
-  --color-text-muted: #a1a1aa;
-  --color-text-subtle: #71717a;
+  --color-background: #030303;
+  --color-foreground: #fafafa;
+  --color-muted-foreground: #a1a1aa;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-input: rgba(255, 255, 255, 0.08);
+  --color-accent: rgba(255, 255, 255, 0.06);
+  --color-primary: #fafafa;
+  --color-primary-foreground: #030303;
+  --color-ring: rgba(255, 255, 255, 0.2);
+  --radius-lg: 0.75rem;
 }
 
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background-color: #030303;
-  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }

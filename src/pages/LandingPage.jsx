@@ -1,5 +1,8 @@
+import { useNavigate } from 'react-router-dom'
 import Landing from '../components/Landing/Landing'
 
 export default function LandingPage() {
-  return <Landing />
+  const navigate = useNavigate()
+
+  return <Landing onGetStarted={() => navigate('/auth')} />
 }
