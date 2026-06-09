@@ -11,10 +11,10 @@ export default function ChatPage() {
   const { user, signOut } = useAuth()
   const chat = useChat()
   const {
-    integrations: integrationList,
+    allConnected,
+    partiallyConnected,
     loading: integrationsLoading,
     connecting: integrationsConnecting,
-    allConnected,
     notice: integrationsNotice,
     error: integrationsError,
     connect,
@@ -26,7 +26,7 @@ export default function ChatPage() {
     const connected = searchParams.get('connected')
     if (!connected) return
 
-    handleOAuthReturn(connected)
+    handleOAuthReturn()
     navigate('/chat', { replace: true })
   }, [searchParams, handleOAuthReturn, navigate])
 
@@ -50,10 +50,10 @@ export default function ChatPage() {
       onDeleteSession={chat.removeSession}
       onSend={chat.sendMessage}
       onSignOut={handleSignOut}
-      integrations={integrationList}
+      allConnected={allConnected}
+      partiallyConnected={partiallyConnected}
       integrationsLoading={integrationsLoading}
       integrationsConnecting={integrationsConnecting}
-      allConnected={allConnected}
       integrationsNotice={integrationsNotice}
       integrationsError={integrationsError}
       onConnectIntegration={connect}

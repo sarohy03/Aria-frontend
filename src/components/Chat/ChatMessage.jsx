@@ -42,7 +42,7 @@ export default function ChatMessage({ role, content, artifacts, streaming, toolS
             <LiveArtifacts artifacts={artifacts} />
             {content ? (
               <div className={artifacts?.length ? 'mt-3' : undefined}>
-                <MessageContent content={content} />
+                <MessageContent content={content} streaming={streaming} />
               </div>
             ) : null}
             {content && streaming && !toolStatus && (

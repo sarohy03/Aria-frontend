@@ -27,7 +27,7 @@ export function refreshIntegrations(getToken) {
   return authFetch('/integrations/refresh', { method: 'POST' }, getToken)
 }
 
-export async function startIntegrationConnect(toolkit, getToken) {
-  const data = await authFetch(`/integrations/connect/${toolkit}`, { method: 'POST' }, getToken)
+export async function startIntegrationConnect(getToken) {
+  const data = await authFetch('/integrations/connect', { method: 'POST' }, getToken)
   return data.redirect_url
 }

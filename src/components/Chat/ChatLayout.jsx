@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 import ChatSidebar from './ChatSidebar'
+
+const STICKY_THRESHOLD_PX = 120
 
 export default function ChatLayout({
   sessions,
@@ -17,20 +19,62 @@ export default function ChatLayout({
   onDeleteSession,
   onSend,
   onSignOut,
-  integrations,
+  allConnected,
+  partiallyConnected,
   integrationsLoading,
   integrationsConnecting,
-  allConnected,
   integrationsNotice,
   integrationsError,
   onConnectIntegration,
   onDismissIntegrationsNotice,
 }) {
-  const bottomRef = useRef(null)
+  const scrollRef = useRef(null)
+  const stickToBottomRef = useRef(true)
+  const scrollRafRef = useRef(null)
+
+  const scrollToBottom = useCallback((behavior = 'auto') => {
+    const el = scrollRef.current
+    if (!el || !stickToBottomRef.current) return
+    el.scrollTo({ top: el.scrollHeight, behavior })
+  }, [])
+
+  const scheduleScroll = useCallback(
+    (behavior = 'auto') => {
+      if (scrollRafRef.current != null) return
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollRafRef.current = null
+        scrollToBottom(behavior)
+      })
+    },
+    [scrollToBottom],
+  )
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    stickToBottomRef.current = distanceFromBottom <= STICKY_THRESHOLD_PX
+  }, [])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, streaming])
+    scheduleScroll(streaming ? 'auto' : 'smooth')
+  }, [messages, streaming, scheduleScroll])
+
+  useEffect(() => {
+    return () => {
+      if (scrollRafRef.current != null) {
+        cancelAnimationFrame(scrollRafRef.current)
+      }
+    }
+  }, [])
+
+  const handleSend = useCallback(
+    (text) => {
+      stickToBottomRef.current = true
+      onSend(text)
+    },
+    [onSend],
+  )
 
   return (
     <div className="flex h-screen bg-[#030303] text-zinc-100">
@@ -43,10 +87,10 @@ export default function ChatLayout({
         onDeleteSession={onDeleteSession}
         onSignOut={onSignOut}
         userLabel={userLabel}
-        integrations={integrations}
+        allConnected={allConnected}
+        partiallyConnected={partiallyConnected}
         integrationsLoading={integrationsLoading}
         integrationsConnecting={integrationsConnecting}
-        allConnected={allConnected}
         integrationsNotice={integrationsNotice}
         integrationsError={integrationsError}
         onConnectIntegration={onConnectIntegration}
@@ -54,7 +98,11 @@ export default function ChatLayout({
       />
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="flex-1 overflow-y-auto px-4 py-6">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto px-4 py-6"
+        >
           <div className="mx-auto max-w-3xl space-y-4">
             {!activeSessionId && messages.length === 0 && !loadingMessages && (
               <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
@@ -86,12 +134,10 @@ export default function ChatLayout({
                 {error}
               </div>
             )}
-
-            <div ref={bottomRef} />
           </div>
         </div>
 
-        <ChatInput onSend={onSend} disabled={streaming} />
+        <ChatInput onSend={handleSend} disabled={streaming} />
       </main>
     </div>
   )

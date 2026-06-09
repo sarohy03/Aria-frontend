@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { flushSync } from 'react-dom'
 import { getIdToken } from '@/services/auth/authService'
 import {
   createSession,
@@ -18,8 +17,56 @@ export function useChat() {
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [error, setError] = useState(null)
   const abortRef = useRef(null)
+  const tokenBufferRef = useRef('')
+  const flushRafRef = useRef(null)
+  const assistantIdRef = useRef(null)
 
   const getToken = useCallback(() => getIdToken(), [])
+
+  const flushTokenBuffer = useCallback(() => {
+    flushRafRef.current = null
+    const chunk = tokenBufferRef.current
+    const assistantId = assistantIdRef.current
+    if (!chunk || !assistantId) return
+
+    tokenBufferRef.current = ''
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === assistantId
+          ? { ...msg, content: msg.content + chunk, toolStatus: null }
+          : msg,
+      ),
+    )
+  }, [])
+
+  const scheduleTokenFlush = useCallback(() => {
+    if (flushRafRef.current != null) return
+    flushRafRef.current = requestAnimationFrame(flushTokenBuffer)
+  }, [flushTokenBuffer])
+
+  const appendToken = useCallback(
+    (token) => {
+      tokenBufferRef.current += token
+      scheduleTokenFlush()
+    },
+    [scheduleTokenFlush],
+  )
+
+  const flushTokensNow = useCallback(() => {
+    if (flushRafRef.current != null) {
+      cancelAnimationFrame(flushRafRef.current)
+      flushRafRef.current = null
+    }
+    flushTokenBuffer()
+  }, [flushTokenBuffer])
+
+  useEffect(() => {
+    return () => {
+      if (flushRafRef.current != null) {
+        cancelAnimationFrame(flushRafRef.current)
+      }
+    }
+  }, [])
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -102,6 +149,8 @@ export function useChat() {
 
       setError(null)
       setStreaming(true)
+      tokenBufferRef.current = ''
+      assistantIdRef.current = null
 
       const userMessage = {
         id: `temp-user-${Date.now()}`,
@@ -115,6 +164,7 @@ export function useChat() {
         artifacts: [],
         streaming: true,
       }
+      assistantIdRef.current = assistantPlaceholder.id
 
       setMessages((prev) => [...prev, userMessage, assistantPlaceholder])
 
@@ -144,16 +194,9 @@ export function useChat() {
                 ]
               })
             } else if (event.type === 'token') {
-              flushSync(() => {
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantPlaceholder.id
-                      ? { ...msg, content: msg.content + event.content, toolStatus: null }
-                      : msg,
-                  ),
-                )
-              })
+              appendToken(event.content)
             } else if (event.type === 'tool') {
+              flushTokensNow()
               if (event.status === 'start') {
                 setMessages((prev) =>
                   prev.map((msg) =>
@@ -172,6 +215,7 @@ export function useChat() {
                 )
               }
             } else if (event.type === 'artifact' && event.artifact) {
+              flushTokensNow()
               setMessages((prev) =>
                 prev.map((msg) => {
                   if (msg.id !== assistantPlaceholder.id) return msg
@@ -189,6 +233,7 @@ export function useChat() {
                 }),
               )
             } else if (event.type === 'done') {
+              flushTokensNow()
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantPlaceholder.id
@@ -196,8 +241,10 @@ export function useChat() {
                     : msg,
                 ),
               )
+              assistantIdRef.current = null
               refreshSessions()
             } else if (event.type === 'error') {
+              flushTokensNow()
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantPlaceholder.id
@@ -210,10 +257,12 @@ export function useChat() {
                     : msg,
                 ),
               )
+              assistantIdRef.current = null
             }
           },
         })
       } catch (err) {
+        flushTokensNow()
         if (err.name !== 'AbortError') {
           setError(err.message)
           setMessages((prev) =>
@@ -229,12 +278,13 @@ export function useChat() {
             ),
           )
         }
+        assistantIdRef.current = null
       } finally {
         setStreaming(false)
         abortRef.current = null
       }
     },
-    [activeSessionId, getToken, refreshSessions, streaming],
+    [activeSessionId, appendToken, flushTokensNow, getToken, refreshSessions, streaming],
   )
 
   return {

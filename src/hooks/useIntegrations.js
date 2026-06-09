@@ -6,72 +6,107 @@ import {
   startIntegrationConnect,
 } from '@/services/integrations/integrationsApi'
 
+const BUNDLE_KEY = 'aria_composio_bundle'
+
 export function useIntegrations() {
-  const [integrations, setIntegrations] = useState([])
   const [allConnected, setAllConnected] = useState(false)
+  const [partiallyConnected, setPartiallyConnected] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [connecting, setConnecting] = useState(null)
+  const [connecting, setConnecting] = useState(false)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
 
   const getToken = useCallback(() => getIdToken(), [])
 
+  const applyStatus = useCallback((data) => {
+    setAllConnected(Boolean(data.all_connected))
+    setPartiallyConnected(Boolean(data.partially_connected))
+  }, [])
+
   const loadStatus = useCallback(async () => {
     setError(null)
     try {
       const data = await getIntegrationStatus(getToken)
-      setIntegrations(data.integrations ?? [])
-      setAllConnected(Boolean(data.all_connected))
+      applyStatus(data)
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }, [getToken])
+  }, [applyStatus, getToken])
 
   useEffect(() => {
     loadStatus()
   }, [loadStatus])
 
-  const handleOAuthReturn = useCallback(async (toolkitSlug) => {
-    setLoading(true)
-    setNotice(null)
-    try {
-      const data = await refreshIntegrations(getToken)
-      setIntegrations(data.integrations ?? [])
-      setAllConnected(Boolean(data.all_connected))
-      const label =
-        data.integrations?.find((i) => i.slug === toolkitSlug)?.label ?? 'App'
-      const connected = data.integrations?.find((i) => i.slug === toolkitSlug)?.connected
-      setNotice(
-        connected ? `${label} connected successfully.` : `${label} connection pending…`,
-      )
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [getToken])
+  const continueBundleIfNeeded = useCallback(
+    async (data) => {
+      const isBundle = sessionStorage.getItem(BUNDLE_KEY) === '1'
+      if (data.all_connected || !isBundle) return false
 
-  const connect = useCallback(
-    async (toolkit) => {
-      setConnecting(toolkit)
-      setError(null)
-      setNotice(null)
+      setNotice('Almost done — finishing setup…')
+      setConnecting(true)
       try {
-        const redirectUrl = await startIntegrationConnect(toolkit, getToken)
+        const redirectUrl = await startIntegrationConnect(getToken)
         window.location.href = redirectUrl
+        return true
       } catch (err) {
+        sessionStorage.removeItem(BUNDLE_KEY)
         setError(err.message)
-        setConnecting(null)
+        setConnecting(false)
+        return false
       }
     },
     [getToken],
   )
 
+  const handleOAuthReturn = useCallback(async () => {
+    setLoading(true)
+    setNotice(null)
+    try {
+      const data = await refreshIntegrations(getToken)
+      applyStatus(data)
+
+      if (data.all_connected) {
+        sessionStorage.removeItem(BUNDLE_KEY)
+        setNotice('Gmail and Google Docs connected successfully.')
+        return
+      }
+
+      const chained = await continueBundleIfNeeded(data)
+      if (chained) return
+
+      if (sessionStorage.getItem(BUNDLE_KEY) === '1') {
+        setNotice('Connection in progress…')
+        return
+      }
+
+      setNotice('Google connection updated.')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [applyStatus, continueBundleIfNeeded, getToken])
+
+  const connect = useCallback(async () => {
+    setConnecting(true)
+    setError(null)
+    setNotice(null)
+    sessionStorage.setItem(BUNDLE_KEY, '1')
+    try {
+      const redirectUrl = await startIntegrationConnect(getToken)
+      window.location.href = redirectUrl
+    } catch (err) {
+      sessionStorage.removeItem(BUNDLE_KEY)
+      setError(err.message)
+      setConnecting(false)
+    }
+  }, [getToken])
+
   return {
-    integrations,
     allConnected,
+    partiallyConnected,
     loading,
     connecting,
     error,

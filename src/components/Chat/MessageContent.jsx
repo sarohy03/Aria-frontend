@@ -3,7 +3,11 @@ import remarkGfm from 'remark-gfm'
 import ChatArtifact from './artifacts/ChatArtifact'
 import { parseMessageParts } from './artifacts/parseArtifacts'
 
-export default function MessageContent({ content }) {
+export default function MessageContent({ content, streaming = false }) {
+  if (streaming) {
+    return <p className="whitespace-pre-wrap">{content}</p>
+  }
+
   const parts = parseMessageParts(content)
 
   return (
