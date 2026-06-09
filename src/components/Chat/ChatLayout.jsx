@@ -74,6 +74,7 @@ export default function ChatLayout({
                 key={message.id}
                 role={message.role}
                 content={message.content}
+                artifacts={message.artifacts}
                 streaming={message.streaming}
                 toolStatus={message.toolStatus}
                 error={message.error}

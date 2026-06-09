@@ -1,9 +1,14 @@
 import { Loader2 } from 'lucide-react'
+import LiveArtifacts from './artifacts/LiveArtifacts'
 import MessageContent from './MessageContent'
 
-export default function ChatMessage({ role, content, streaming, toolStatus, error }) {
+export default function ChatMessage({ role, content, artifacts, streaming, toolStatus, error }) {
   const isUser = role === 'user'
-  const hasArtifact = content?.includes('```aria-artifact')
+  const hasArtifact =
+    (artifacts?.length ?? 0) > 0 ||
+    content?.includes('```aria-artifact') ||
+    content?.includes('aria-artifact {') ||
+    content?.includes('aria-artifact{')
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -34,7 +39,12 @@ export default function ChatMessage({ role, content, streaming, toolStatus, erro
                 <span className="animate-pulse [animation-delay:300ms]">●</span>
               </span>
             )}
-            {content ? <MessageContent content={content} /> : null}
+            <LiveArtifacts artifacts={artifacts} />
+            {content ? (
+              <div className={artifacts?.length ? 'mt-3' : undefined}>
+                <MessageContent content={content} />
+              </div>
+            ) : null}
             {content && streaming && !toolStatus && (
               <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-zinc-400" />
             )}

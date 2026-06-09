@@ -83,7 +83,7 @@ export default function IntegrationsPanel({
 
       {!loading && !allConnected && (
         <p className="mt-2 px-1 text-[11px] leading-relaxed text-zinc-500">
-          Connect your Google account so Aria can read email and search Drive.
+          Connect your Google account so Aria can read email and edit Google Docs.
         </p>
       )}
     </div>

@@ -1,3 +1,6 @@
+import DocArtifact from './DocArtifact'
+import DocPreviewArtifact from './DocPreviewArtifact'
+import DocSearchArtifact from './DocSearchArtifact'
 import EmailArtifact from './EmailArtifact'
 import EmailDraftArtifact from './EmailDraftArtifact'
 import EmailListArtifact from './EmailListArtifact'
@@ -17,6 +20,12 @@ export default function ChatArtifact({ data }) {
       return (
         <EmailSentArtifact to={data.to} subject={data.subject} status={data.status} />
       )
+    case 'doc-preview':
+      return <DocPreviewArtifact {...data} />
+    case 'doc-search':
+      return <DocSearchArtifact {...data} />
+    case 'doc':
+      return <DocArtifact {...data} />
     default:
       return (
         <pre className="overflow-x-auto rounded-lg border border-white/10 bg-zinc-900 p-3 text-xs text-zinc-400">

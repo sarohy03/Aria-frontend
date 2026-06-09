@@ -112,6 +112,7 @@ export function useChat() {
         id: `temp-assistant-${Date.now()}`,
         role: 'assistant',
         content: '',
+        artifacts: [],
         streaming: true,
       }
 
@@ -170,6 +171,23 @@ export function useChat() {
                   ),
                 )
               }
+            } else if (event.type === 'artifact' && event.artifact) {
+              setMessages((prev) =>
+                prev.map((msg) => {
+                  if (msg.id !== assistantPlaceholder.id) return msg
+                  const arts = msg.artifacts ?? []
+                  const incoming = event.artifact
+                  const idx = incoming.id
+                    ? arts.findIndex((a) => a.id === incoming.id)
+                    : -1
+                  if (idx >= 0) {
+                    const next = [...arts]
+                    next[idx] = { ...next[idx], ...incoming }
+                    return { ...msg, artifacts: next }
+                  }
+                  return { ...msg, artifacts: [...arts, incoming] }
+                }),
+              )
             } else if (event.type === 'done') {
               setMessages((prev) =>
                 prev.map((msg) =>
