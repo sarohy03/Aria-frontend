@@ -124,3 +124,11 @@ export function signOutUser() {
 export function subscribeToAuth(callback) {
   return onAuthStateChanged(auth, callback)
 }
+
+export async function getIdToken() {
+  const user = auth.currentUser
+  if (!user) {
+    throw new Error('Not authenticated')
+  }
+  return user.getIdToken()
+}

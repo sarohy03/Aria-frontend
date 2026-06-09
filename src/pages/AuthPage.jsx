@@ -21,7 +21,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate('/', { replace: true })
+      navigate('/chat', { replace: true })
     }
   }, [authLoading, user, navigate])
 
@@ -30,7 +30,7 @@ export default function AuthPage() {
     setInfoMessage('')
   }
 
-  const goHome = () => navigate('/', { replace: true })
+  const goChat = () => navigate('/chat', { replace: true })
 
   const handleToggle = () => {
     setIsSignIn((prev) => !prev)
@@ -58,7 +58,7 @@ export default function AuthPage() {
         setInfoMessage('')
       }
 
-      goHome()
+      goChat()
     } catch (err) {
       setError(getAuthErrorMessage(err))
     } finally {
@@ -85,7 +85,7 @@ export default function AuthPage() {
 
     try {
       await signUpWithEmail({ name, email, password })
-      goHome()
+      goChat()
     } catch (err) {
       setError(getAuthErrorMessage(err))
     } finally {
@@ -116,7 +116,7 @@ export default function AuthPage() {
         return
       }
 
-      goHome()
+      goChat()
     } catch (err) {
       setError(getAuthErrorMessage(err))
     } finally {

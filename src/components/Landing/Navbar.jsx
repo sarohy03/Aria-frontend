@@ -31,9 +31,18 @@ export default function Navbar({ onGetStarted }) {
             Features
           </a>
           {!loading && user && (
-            <span className="hidden text-sm text-zinc-400 sm:inline">
-              {user.displayName || user.email}
-            </span>
+            <>
+              <button
+                type="button"
+                onClick={() => navigate('/chat')}
+                className="hidden text-sm text-zinc-300 transition-colors hover:text-white sm:inline"
+              >
+                Chat
+              </button>
+              <span className="hidden text-sm text-zinc-400 sm:inline">
+                {user.displayName || user.email}
+              </span>
+            </>
           )}
           <Button
             variant="secondary"
