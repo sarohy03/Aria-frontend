@@ -28,12 +28,13 @@ export function refreshIntegrations(getToken) {
 }
 
 export function getComposioCallbackUrl() {
-  return `${window.location.origin}/chat?connected=composio`
+  const base = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '')
+  return `${base}/oauth/callback?connected=composio`
 }
 
-export async function startIntegrationConnect(getToken) {
+export async function startToolkitConnect(getToken, toolkit) {
   const data = await authFetch(
-    '/integrations/connect',
+    `/integrations/connect/${toolkit}`,
     {
       method: 'POST',
       body: JSON.stringify({ callback_url: getComposioCallbackUrl() }),

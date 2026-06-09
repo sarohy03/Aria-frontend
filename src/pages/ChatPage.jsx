@@ -11,32 +11,24 @@ export default function ChatPage() {
   const { user, signOut } = useAuth()
   const chat = useChat()
   const {
-    allConnected,
-    partiallyConnected,
+    integrations,
     loading: integrationsLoading,
-    connecting: integrationsConnecting,
+    connectingToolkit,
     notice: integrationsNotice,
     error: integrationsError,
-    connect,
+    connectToolkit,
     clearNotice,
-    handleOAuthReturn,
   } = useIntegrations()
 
+  // Legacy Composio callbacks may still land on /chat
   useEffect(() => {
-    if (searchParams.get('connected') !== 'composio') return
-
-    let cancelled = false
-    ;(async () => {
-      const redirecting = await handleOAuthReturn()
-      if (!cancelled && !redirecting) {
-        navigate('/chat', { replace: true })
-      }
-    })()
-
-    return () => {
-      cancelled = true
+    if (
+      searchParams.get('connected') === 'composio' ||
+      searchParams.has('connected_account_id')
+    ) {
+      navigate(`/oauth/callback?${searchParams.toString()}`, { replace: true })
     }
-  }, [searchParams, handleOAuthReturn, navigate])
+  }, [searchParams, navigate])
 
   const handleSignOut = async () => {
     await signOut()
@@ -58,13 +50,12 @@ export default function ChatPage() {
       onDeleteSession={chat.removeSession}
       onSend={chat.sendMessage}
       onSignOut={handleSignOut}
-      allConnected={allConnected}
-      partiallyConnected={partiallyConnected}
+      integrations={integrations}
       integrationsLoading={integrationsLoading}
-      integrationsConnecting={integrationsConnecting}
+      connectingToolkit={connectingToolkit}
       integrationsNotice={integrationsNotice}
       integrationsError={integrationsError}
-      onConnectIntegration={connect}
+      onConnectToolkit={connectToolkit}
       onDismissIntegrationsNotice={clearNotice}
     />
   )

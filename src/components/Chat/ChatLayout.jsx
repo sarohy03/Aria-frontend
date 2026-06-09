@@ -20,13 +20,12 @@ export default function ChatLayout({
   onDeleteSession,
   onSend,
   onSignOut,
-  allConnected,
-  partiallyConnected,
+  integrations,
   integrationsLoading,
-  integrationsConnecting,
+  connectingToolkit,
   integrationsNotice,
   integrationsError,
-  onConnectIntegration,
+  onConnectToolkit,
   onDismissIntegrationsNotice,
 }) {
   const scrollRef = useRef(null)
@@ -95,13 +94,12 @@ export default function ChatLayout({
         onDeleteSession={onDeleteSession}
         onSignOut={onSignOut}
         userLabel={userLabel}
-        allConnected={allConnected}
-        partiallyConnected={partiallyConnected}
+        integrations={integrations}
         integrationsLoading={integrationsLoading}
-        integrationsConnecting={integrationsConnecting}
+        connectingToolkit={connectingToolkit}
         integrationsNotice={integrationsNotice}
         integrationsError={integrationsError}
-        onConnectIntegration={onConnectIntegration}
+        onConnectToolkit={onConnectToolkit}
         onDismissIntegrationsNotice={onDismissIntegrationsNotice}
       />
 

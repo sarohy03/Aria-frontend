@@ -3,22 +3,22 @@ import { getIdToken } from '@/services/auth/authService'
 import {
   getIntegrationStatus,
   refreshIntegrations,
-  startIntegrationConnect,
+  startToolkitConnect,
 } from '@/services/integrations/integrationsApi'
 
-const BUNDLE_KEY = 'aria_composio_bundle'
-
 export function useIntegrations() {
+  const [integrations, setIntegrations] = useState([])
   const [allConnected, setAllConnected] = useState(false)
   const [partiallyConnected, setPartiallyConnected] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [connecting, setConnecting] = useState(false)
+  const [connectingToolkit, setConnectingToolkit] = useState(null)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
 
   const getToken = useCallback(() => getIdToken(), [])
 
   const applyStatus = useCallback((data) => {
+    setIntegrations(data.integrations ?? [])
     setAllConnected(Boolean(data.all_connected))
     setPartiallyConnected(Boolean(data.partially_connected))
   }, [])
@@ -39,81 +39,54 @@ export function useIntegrations() {
     loadStatus()
   }, [loadStatus])
 
-  const continueBundleIfNeeded = useCallback(
-    async (data) => {
-      const isBundle = sessionStorage.getItem(BUNDLE_KEY) === '1'
-      if (data.all_connected || !isBundle) return false
+  const handleOAuthReturn = useCallback(async () => {
+    setLoading(true)
+    setNotice(null)
+    setConnectingToolkit(null)
+    try {
+      const data = await refreshIntegrations(getToken)
+      applyStatus(data)
 
-      setNotice('Almost done — finishing setup…')
-      setConnecting(true)
+      const connected = (data.integrations ?? []).filter((item) => item.connected)
+      if (data.all_connected) {
+        setNotice('Gmail and Google Docs connected successfully.')
+      } else if (connected.length === 1) {
+        setNotice(`${connected[0].label} connected. Connect the other service when ready.`)
+      } else {
+        setNotice('Google connection updated.')
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [applyStatus, getToken])
+
+  const connectToolkit = useCallback(
+    async (toolkit) => {
+      setConnectingToolkit(toolkit)
+      setError(null)
+      setNotice(null)
       try {
-        const redirectUrl = await startIntegrationConnect(getToken)
+        const redirectUrl = await startToolkitConnect(getToken, toolkit)
         window.location.href = redirectUrl
-        return true
       } catch (err) {
-        sessionStorage.removeItem(BUNDLE_KEY)
         setError(err.message)
-        setConnecting(false)
-        return false
+        setConnectingToolkit(null)
       }
     },
     [getToken],
   )
 
-  const handleOAuthReturn = useCallback(async () => {
-    setLoading(true)
-    setNotice(null)
-    try {
-      const data = await refreshIntegrations(getToken)
-      applyStatus(data)
-
-      if (data.all_connected) {
-        sessionStorage.removeItem(BUNDLE_KEY)
-        setNotice('Gmail and Google Docs connected successfully.')
-        return false
-      }
-
-      const chained = await continueBundleIfNeeded(data)
-      if (chained) return true
-
-      if (sessionStorage.getItem(BUNDLE_KEY) === '1') {
-        setNotice('Connection in progress…')
-        return false
-      }
-
-      setNotice('Google connection updated.')
-      return false
-    } catch (err) {
-      setError(err.message)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [applyStatus, continueBundleIfNeeded, getToken])
-
-  const connect = useCallback(async () => {
-    setConnecting(true)
-    setError(null)
-    setNotice(null)
-    sessionStorage.setItem(BUNDLE_KEY, '1')
-    try {
-      const redirectUrl = await startIntegrationConnect(getToken)
-      window.location.href = redirectUrl
-    } catch (err) {
-      sessionStorage.removeItem(BUNDLE_KEY)
-      setError(err.message)
-      setConnecting(false)
-    }
-  }, [getToken])
-
   return {
+    integrations,
     allConnected,
     partiallyConnected,
     loading,
-    connecting,
+    connectingToolkit,
     error,
     notice,
-    connect,
+    connectToolkit,
     loadStatus,
     handleOAuthReturn,
     clearNotice: () => setNotice(null),

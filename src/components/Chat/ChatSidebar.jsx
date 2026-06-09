@@ -11,13 +11,12 @@ export default function ChatSidebar({
   onDeleteSession,
   onSignOut,
   userLabel,
-  allConnected,
-  partiallyConnected,
+  integrations,
   integrationsLoading,
-  integrationsConnecting,
+  connectingToolkit,
   integrationsNotice,
   integrationsError,
-  onConnectIntegration,
+  onConnectToolkit,
   onDismissIntegrationsNotice,
 }) {
   return (
@@ -38,13 +37,12 @@ export default function ChatSidebar({
       </div>
 
       <IntegrationsPanel
-        allConnected={allConnected}
-        partiallyConnected={partiallyConnected}
+        integrations={integrations}
         loading={integrationsLoading}
-        connecting={integrationsConnecting}
+        connectingToolkit={connectingToolkit}
         notice={integrationsNotice}
         error={integrationsError}
-        onConnect={onConnectIntegration}
+        onConnectToolkit={onConnectToolkit}
         onDismissNotice={onDismissIntegrationsNotice}
       />
 

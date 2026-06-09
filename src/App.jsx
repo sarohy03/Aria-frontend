@@ -4,6 +4,7 @@ import ProtectedRoute from '@/components/Auth/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import ChatPage from './pages/ChatPage'
+import OAuthCallbackPage from './pages/OAuthCallbackPage'
 
 export default function App() {
   return (
@@ -12,6 +13,14 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/oauth/callback"
+            element={
+              <ProtectedRoute>
+                <OAuthCallbackPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/chat"
             element={
