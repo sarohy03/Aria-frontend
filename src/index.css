@@ -22,6 +22,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-in {
+  animation: message-in 300ms cubic-bezier(0.25, 0.4, 0.25, 1) both;
+}
+
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;

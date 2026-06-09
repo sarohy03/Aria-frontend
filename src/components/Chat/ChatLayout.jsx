@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import ChatEmptyState from './ChatEmptyState'
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 import ChatSidebar from './ChatSidebar'
@@ -76,8 +77,15 @@ export default function ChatLayout({
     [onSend],
   )
 
+  const showEmpty = !activeSessionId && messages.length === 0 && !loadingMessages
+
   return (
-    <div className="flex h-screen bg-[#030303] text-zinc-100">
+    <div className="relative flex h-screen overflow-hidden bg-[#030303] text-zinc-100">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 top-0 h-[28rem] w-[28rem] rounded-full bg-violet-600/[0.07] blur-[100px]" />
+        <div className="absolute -right-24 bottom-0 h-[24rem] w-[24rem] rounded-full bg-blue-600/[0.05] blur-[100px]" />
+      </div>
+
       <ChatSidebar
         sessions={sessions}
         activeSessionId={activeSessionId}
@@ -97,24 +105,19 @@ export default function ChatLayout({
         onDismissIntegrationsNotice={onDismissIntegrationsNotice}
       />
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="relative flex min-w-0 flex-1 flex-col">
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto px-4 py-6"
+          className="flex-1 overflow-y-auto px-4 pb-36 pt-6"
         >
-          <div className="mx-auto max-w-3xl space-y-4">
-            {!activeSessionId && messages.length === 0 && !loadingMessages && (
-              <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
-                <h1 className="text-2xl font-medium text-white">How can I help?</h1>
-                <p className="mt-2 max-w-md text-sm text-zinc-400">
-                  Ask Aria anything about your business — start typing below to begin a new chat.
-                </p>
-              </div>
-            )}
+          <div className="mx-auto max-w-3xl space-y-6">
+            {showEmpty && <ChatEmptyState onSuggestion={handleSend} />}
 
             {loadingMessages && (
-              <p className="text-center text-sm text-zinc-500">Loading messages...</p>
+              <div className="flex justify-center py-12">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-violet-400" />
+              </div>
             )}
 
             {messages.map((message) => (
