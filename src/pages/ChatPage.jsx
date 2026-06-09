@@ -23,11 +23,19 @@ export default function ChatPage() {
   } = useIntegrations()
 
   useEffect(() => {
-    const connected = searchParams.get('connected')
-    if (!connected) return
+    if (searchParams.get('connected') !== 'composio') return
 
-    handleOAuthReturn()
-    navigate('/chat', { replace: true })
+    let cancelled = false
+    ;(async () => {
+      const redirecting = await handleOAuthReturn()
+      if (!cancelled && !redirecting) {
+        navigate('/chat', { replace: true })
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
   }, [searchParams, handleOAuthReturn, navigate])
 
   const handleSignOut = async () => {

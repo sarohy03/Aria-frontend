@@ -70,20 +70,22 @@ export function useIntegrations() {
       if (data.all_connected) {
         sessionStorage.removeItem(BUNDLE_KEY)
         setNotice('Gmail and Google Docs connected successfully.')
-        return
+        return false
       }
 
       const chained = await continueBundleIfNeeded(data)
-      if (chained) return
+      if (chained) return true
 
       if (sessionStorage.getItem(BUNDLE_KEY) === '1') {
         setNotice('Connection in progress…')
-        return
+        return false
       }
 
       setNotice('Google connection updated.')
+      return false
     } catch (err) {
       setError(err.message)
+      return false
     } finally {
       setLoading(false)
     }

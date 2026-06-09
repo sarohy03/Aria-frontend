@@ -27,7 +27,18 @@ export function refreshIntegrations(getToken) {
   return authFetch('/integrations/refresh', { method: 'POST' }, getToken)
 }
 
+export function getComposioCallbackUrl() {
+  return `${window.location.origin}/chat?connected=composio`
+}
+
 export async function startIntegrationConnect(getToken) {
-  const data = await authFetch('/integrations/connect', { method: 'POST' }, getToken)
+  const data = await authFetch(
+    '/integrations/connect',
+    {
+      method: 'POST',
+      body: JSON.stringify({ callback_url: getComposioCallbackUrl() }),
+    },
+    getToken,
+  )
   return data.redirect_url
 }
