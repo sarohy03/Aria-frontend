@@ -113,7 +113,7 @@ VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
 ```
 
-For local development, `VITE_API_URL` can point at the Vite proxy (`/api`). For production, set it to your Render backend URL.
+For local development, `VITE_API_URL` can be `/api` (Vite proxies to `localhost:8000`). For production, set it to your Render backend URL.
 
 ### 3. Run the dev server
 
@@ -191,12 +191,16 @@ The chat hook reads the SSE stream and appends tokens to the active assistant me
 
 ## Deployment (Vercel)
 
-1. Connect this repository to Vercel
-2. Set root directory to `frontend`
-3. Add environment variables (`VITE_*`) in the Vercel dashboard
-4. Deploy — Vercel runs `npm run build` automatically
+Full guide: [DEPLOY.md](./DEPLOY.md)
 
-Ensure `VITE_API_URL` points to your production backend (e.g. `https://aria-backend.onrender.com`).
+1. Import the **frontend** repo in Vercel
+2. Framework: **Vite** (auto-detected via `vercel.json`)
+3. Set all `VITE_*` env vars in the Vercel dashboard
+4. Deploy
+
+**Production `VITE_API_URL`:** your Render backend URL, e.g. `https://aria-api.onrender.com` (no trailing slash, no `/api` suffix).
+
+`vercel.json` handles SPA routing (`/chat`, etc.) and Google sign-in headers.
 
 ---
 

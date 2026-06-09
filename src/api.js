@@ -14,6 +14,11 @@ export function getHealth() {
   return request('/health')
 }
 
+/** Fire-and-forget ping to wake cold backends (e.g. Render free tier). */
+export function warmBackend() {
+  fetch(`${API_BASE}/health`, { method: 'GET' }).catch(() => {})
+}
+
 export function getMessage() {
   return request('/')
 }
