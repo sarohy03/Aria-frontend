@@ -249,7 +249,7 @@ function AuthShowcase({ quote }) {
           </blockquote>
         </div>
 
-        <p className="pb-4 text-xs text-zinc-600">Gmail &amp; Google Drive connected</p>
+        <p className="pb-4 text-xs text-zinc-600">Gmail &amp; Google Docs connected</p>
       </div>
     </div>
   )

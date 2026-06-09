@@ -1,4 +1,4 @@
-import { Mail, Send, FolderSearch, HardDrive, GitBranch, Brain } from 'lucide-react'
+import { Mail, Send, FileText, FilePlus, GitBranch, Brain } from 'lucide-react'
 
 const features = [
   {
@@ -14,22 +14,22 @@ const features = [
     example: '"Draft a reply to Ahmed\'s invoice email"',
   },
   {
-    icon: FolderSearch,
-    title: 'Search your Drive',
-    description: 'Find files by name, content, or date without digging through folders.',
+    icon: FileText,
+    title: 'Search your Docs',
+    description: 'Find Google Docs by title or recent edits without digging through folders.',
     example: '"Find my proposal from last month"',
   },
   {
-    icon: HardDrive,
-    title: 'Save to Drive',
-    description: 'Turn summaries and documents into files saved directly to your Google Drive.',
-    example: '"Save this summary to my Drive"',
+    icon: FilePlus,
+    title: 'Create & edit Docs',
+    description: 'Turn summaries and notes into Google Docs, or update existing ones in place.',
+    example: '"Create a Google Doc with this meeting summary"',
   },
   {
     icon: GitBranch,
     title: 'Cross-tool workflows',
-    description: 'Pull an attachment from Gmail and save it to Drive — in one conversation.',
-    example: '"Find the contract John emailed and save it to Drive"',
+    description: 'Pull context from Gmail and turn it into a Doc — in one conversation.',
+    example: '"Summarize John\'s contract email in a new Google Doc"',
   },
   {
     icon: Brain,

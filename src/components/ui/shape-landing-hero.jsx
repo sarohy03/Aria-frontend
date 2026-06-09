@@ -63,10 +63,10 @@ const fadeUpVariants = {
 }
 
 export function HeroGeometric({
-  badge = 'Connected to Gmail & Google Drive',
+  badge = 'Connected to Gmail & Google Docs',
   title1 = 'Your AI Chief of Staff',
   title2 = 'One chat. Your entire work life.',
-  description = 'Read emails, send replies, find files, and manage your business — without leaving the conversation.',
+  description = 'Read emails, send replies, search and edit Google Docs — without leaving the conversation.',
   onGetStarted,
 }) {
   return (

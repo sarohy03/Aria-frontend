@@ -3,7 +3,7 @@ export default function HowItWorks() {
     {
       step: '01',
       title: 'Connect',
-      description: 'Sign in with email or Google. Aria links to your Gmail and Drive securely.',
+      description: 'Sign in with email or Google. Aria links to your Gmail and Google Docs securely.',
     },
     {
       step: '02',

@@ -2,7 +2,7 @@
 
 > **One chat. Your entire work life.**
 
-React client for **Aria**, an AI Chief of Staff for small business owners. Users sign in with Google, chat in natural language, and manage Gmail and Google Drive without leaving a single interface.
+React client for **Aria**, an AI Chief of Staff for small business owners. Users sign in with Google, chat in natural language, and manage Gmail and Google Docs without leaving a single interface.
 
 ---
 
@@ -185,7 +185,7 @@ The chat hook reads the SSE stream and appends tokens to the active assistant me
 - [ ] Session history (load / switch / delete)
 - [ ] Connect all endpoints to backend
 - [ ] Deploy to Vercel
-- [ ] End-to-end test with real Gmail + Drive
+- [ ] End-to-end test with real Gmail + Google Docs
 
 ---
 
